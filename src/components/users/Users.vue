@@ -23,8 +23,30 @@
       <el-table-column prop="mobile"
                        label="电话"
                        width="180"></el-table-column>
-      <el-table-column label="用户状态"></el-table-column>
-      <el-table-column label="操作"></el-table-column>
+      <el-table-column label="用户状态">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.mg_state"
+                     @change="changeUserState(scope.row)">
+          </el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button size="mini"
+                     icon="el-icon-edit"
+                     plain
+                     type="primary"></el-button>
+          <el-button size="mini"
+                     type="danger"
+                     plain
+                     icon="el-icon-delete
+"></el-button>
+          <el-button size="mini"
+                     icon="el-icon-check"
+                     type="success"
+                     plain>分配角色</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <!--
@@ -64,6 +86,7 @@ export default {
       pagenum: 1,
       // 每页大小：
       pagesize: 3
+
     }
   },
 
@@ -110,6 +133,31 @@ export default {
     changePage (curPage) {
       // console.log('切换分页了：', curPage)
       this.getUserList(curPage)
+    },
+    // 切换当前用户转态
+    async changeUserState (user) {
+      try {
+        const res = await this.$http.put(`/users/${user.id}/state/${user.mg_state}`, null, {
+
+        })
+        if (res.data.meta.status === 200) {
+          this.$message({
+            type: 'success',
+            message: res.data.meta.msg,
+            duration: 1000
+          })
+        } else {
+          this.$message({
+            type: 'warning',
+            message: res.data.meta.msg
+          })
+        }
+      } catch (er) {
+        this.$message({
+          type: 'error',
+          message: '设置转态失败'
+        })
+      }
     }
   }
 }

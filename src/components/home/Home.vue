@@ -12,7 +12,8 @@
         </el-col>
         <el-col :span="6">
           <div class="home-huiyuan">欢迎上海前端31期王者会员
-            <a href="javascript:;">退出</a>
+            <a href="javascript:;"
+               @click="open2">退出</a>
           </div>
         </el-col>
       </el-row>
@@ -50,7 +51,23 @@
 
 <script>
 export default {
-  methods: {}
+  methods: {
+    open2 () {
+      this.$confirm('是否要退出?', '温馨提示:', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$router.push('/login')
+        localStorage.removeItem('token')
+      }).catch(() => {
+        this.$message({
+          type: 'warning',
+          message: '已取消退出'
+        })
+      })
+    }
+  }
 }
 </script>
 
