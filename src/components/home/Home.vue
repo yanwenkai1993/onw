@@ -39,6 +39,27 @@
               </template>
             </el-menu-item>
           </el-submenu>
+
+          <el-submenu index="2">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>权限管理</span>
+            </template>
+            <el-menu-item index="/roles">
+              <!-- 二级菜单的图标和名称： -->
+              <template slot="title">
+                <i class="el-icon-menu"></i>
+                <span>角色列表</span>
+              </template>
+            </el-menu-item>
+            <el-menu-item index="users">
+              <!-- 二级菜单的图标和名称： -->
+              <template slot="title">
+                <i class="el-icon-menu"></i>
+                <span>权限列表</span>
+              </template>
+            </el-menu-item>
+          </el-submenu>
         </el-menu>
       </el-aside>
       <el-main>
