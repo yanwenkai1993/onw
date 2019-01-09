@@ -4,6 +4,9 @@ import Login from '@/components/login/Login'
 import Home from '@/components/home/Home'
 import Users from '@/components/users/Users'
 import Roles from '@/components/roles/Roles'
+import Righys from '@/components/rights/Rights'
+import Goods from '@/components/goods/Goods'
+import GoodsAdd from '@/components/goods-add/GoodsAdd'
 Vue.use(Router)
 
 // 创建路由实列
@@ -24,6 +27,15 @@ const router = new Router({
     }, {
       path: '/roles',
       component: Roles
+    }, {
+      path: '/rights',
+      component: Righys
+    }, {
+      path: '/goods/:page?',
+      component: Goods
+    }, {
+      path: '/goods-add',
+      component: GoodsAdd
     }]
   }
   ]

@@ -71,7 +71,8 @@
           <el-button size="mini"
                      icon="el-icon-check"
                      type="success"
-                     plain>分配角色</el-button>
+                     plain
+                     @click="showRoleDialog(scope.row)">分配角色</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -153,6 +154,33 @@
                    @click="editAddUser">确 定</el-button>
       </div>
     </el-dialog>
+
+    <!-- 分配权限的对话框 -->
+    <el-dialog title="分配角色"
+               :visible.sync="isshowRoleDialog">
+      <el-form :model="roleForm"
+               label-width="100px">
+        <el-form-item label="用户名">
+          <el-tag type="info">{{roleForm.userName}}</el-tag>
+        </el-form-item>
+        <el-form-item label="角色列表">
+          <el-select v-model="roleForm.rid"
+                     placeholder="请选择角色列表">
+
+            <el-option :label="role.roleName"
+                       :value="role.id"
+                       v-for="role in roleList"
+                       :key="role.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer"
+           class="dialog-footer">
+        <el-button @click="isshowRoleDialog = false">取 消</el-button>
+        <el-button type="primary"
+                   @click="assignRole">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 
 </template>
@@ -165,6 +193,8 @@ export default {
   // 进入页面，发送请求，获取数据
   created () {
     this.getUserList()
+    //  获取角色权限列表
+    this.getRoleList()
   },
 
   data () {
@@ -224,6 +254,13 @@ export default {
             trigger: 'blur'
           }
         ]
+      },
+      isshowRoleDialog: false,
+      roleList: [], // 选择角色的数据
+      roleForm: {
+        uesrName: '',
+        rid: -1,
+        userId: -1
       }
     }
   },
@@ -247,7 +284,6 @@ export default {
           }
         })
         .then(res => {
-          console.log('用户列表数据：', res)
           if (res.data.meta.status === 200) {
             // 获取数据成功
             this.userList = res.data.data.users
@@ -266,7 +302,12 @@ export default {
           }
         })
     },
-
+    // 封装一个方法一进入页面就获取用户角色数据
+    async getRoleList () {
+      const res = await this.$http.get('/roles')
+      console.log(res)
+      this.roleList = res.data.data
+    },
     // 切换分页，获取当前页数据
     changePage (curPage) {
       // console.log('切换分页了：', curPage)
@@ -384,6 +425,33 @@ export default {
         // 刷新当前页
         this.getUserList(this.pagenum, this.input5)
       }
+    }, // 分配权限的对话框
+    showRoleDialog (curUser) {
+      this.isshowRoleDialog = true
+      // 获取当前的用户名，判断是否是管理员
+      const role = this.roleList.find(itme => itme.roleName === curUser.role_name)
+      // 判断role是否存在，如果存在就获取role.id不存在就设置默认值
+      const rid = role ? role.id : ''
+      // 设置用户默认值和角色下拉默认选中
+      this.roleForm.userName = curUser.username
+      this.roleForm.rid = rid
+      this.roleForm.userId = curUser.id
+    },
+    // 点击确定按钮的时候，关闭对话框，提示成功，刷新数据列表
+    async assignRole () {
+      // 获取用户的id和角色id
+      const { userId, rid } = this.roleForm
+      const res = await this.$http.put(`users/${userId}/role`, { rid })
+      // 可以判断一下懒得写
+      // 关闭对话框
+      this.isshowRoleDialog = false
+      // 提示用户分配成功
+      this.$message({
+        type: 'success',
+        message: res.data.meta.msg
+      })
+      // 刷新页面
+      this.getUserList()
     }
   }
 }

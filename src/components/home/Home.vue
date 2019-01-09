@@ -21,45 +21,30 @@
     <el-container>
       <el-aside width="200px"
                 class="home-aside">
-        <el-menu default-active="4"
+        <el-menu default-active="activePath"
                  background-color="#545c64"
                  text-color="#fff"
+                 :unique-opened="true"
                  active-text-color="#ffd04b"
                  :router="true">
-          <el-submenu index="1">
+          <el-submenu :index="level1.order + ''"
+                      v-for="level1 in menus"
+                      :key="level1.id">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>用户管理</span>
+              <span>{{level1.authName}}</span>
             </template>
-            <el-menu-item index="users">
+            <el-menu-item :index="'/' + level2.path"
+                          v-for="level2 in level1.children"
+                          :key="level2.id">
               <!-- 二级菜单的图标和名称： -->
               <template slot="title">
                 <i class="el-icon-menu"></i>
-                <span>用户列表</span>
+                <span>{{level2.authName}}</span>
               </template>
             </el-menu-item>
           </el-submenu>
 
-          <el-submenu index="2">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>权限管理</span>
-            </template>
-            <el-menu-item index="/roles">
-              <!-- 二级菜单的图标和名称： -->
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>角色列表</span>
-              </template>
-            </el-menu-item>
-            <el-menu-item index="users">
-              <!-- 二级菜单的图标和名称： -->
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>权限列表</span>
-              </template>
-            </el-menu-item>
-          </el-submenu>
         </el-menu>
       </el-aside>
       <el-main>
@@ -72,6 +57,22 @@
 
 <script>
 export default {
+  data () {
+    return {
+      menus: []
+    }
+  },
+  created () {
+    this.getMenusList()
+  },
+  // 进入页面获取当前高亮的哈希值默认高亮
+  computed: {
+    activePath () {
+      const { path } = this.$route
+      const pathArr = path.split('/')
+      return pathArr.length === 3 ? '/' + pathArr[1] : path
+    }
+  },
   methods: {
     open2 () {
       this.$confirm('是否要退出?', '温馨提示:', {
@@ -87,6 +88,10 @@ export default {
           message: '已取消退出'
         })
       })
+    },
+    async getMenusList () {
+      const res = await this.$http.get('menus')
+      this.menus = res.data.data
     }
   }
 }
